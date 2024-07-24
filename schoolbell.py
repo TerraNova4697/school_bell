@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from rpc import UpdateScheduleRPC
 import rpc
+from bell import run_priority
 
 
 logger = logging.getLogger("scheduler_logger")
@@ -37,13 +38,13 @@ class SchoolBell(TBDeviceMqttClient):
             "onTill", self.handle_updated_attribute
         )
         self._sub_attr_alarm = self.subscribe_to_attribute(
-            "alarm", self.handle_updated_attribute
+            "alarm", self.handle_updated_attribute_and_run_alarm
         )
         self._sub_attr_alarm_path = self.subscribe_to_attribute(
             "alarmPath", self.handle_updated_attribute
         )
         self._sub_attr_ambulance = self.subscribe_to_attribute(
-            "ambulance", self.handle_updated_attribute
+            "ambulance", self.handle_updated_attribute_and_run_alarm
         )
         self._sub_attr_ambulance_path = self.subscribe_to_attribute(
             "ambulancePath", self.handle_updated_attribute
@@ -55,7 +56,7 @@ class SchoolBell(TBDeviceMqttClient):
             "endLessonPath", self.handle_updated_attribute
         )
         self._sub_attr_fire = self.subscribe_to_attribute(
-            "fire", self.handle_updated_attribute
+            "fire", self.handle_updated_attribute_and_run_alarm
         )
         self._sub_attr_fire_path = self.subscribe_to_attribute(
             "firePath", self.handle_updated_attribute
@@ -115,6 +116,11 @@ class SchoolBell(TBDeviceMqttClient):
             self.update_config(attribute, value)
         except Exception as e:
             logger.exception(e)
+
+    def handle_updated_attribute_and_run_alarm(self, body, *args):
+        self.handle_updated_attribute(body, args)
+        attribute, _ = list(body.items())[0]
+        run_priority(attribute)
 
     def handle_schedule_attribute(self, body, *args):
         try:

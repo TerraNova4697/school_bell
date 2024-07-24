@@ -1,6 +1,7 @@
 import logging
 import argparse
 import os
+import json
 
 from datetime import datetime
 
@@ -29,29 +30,45 @@ def parse_args():
     return parser.parse_args()
 
 
-def allowed_to_run_bell() -> bool:
-    attrs = {}
-    curr_dir = os.path.dirname(__file__)
-    with open(curr_dir + "/attributes.txt") as attrs_file:
-        lines = attrs_file.readlines()
-        for line in lines:
-            key, value = line.split("=")
-            attrs[key] = int(value)
+def allowed_to_run_bell(config) -> bool:
+    now_timestamp = datetime.now().timestamp()
+    if not config["fire"] and not config["alarm"]:
+        if not config["isOff"] and config["isOffTill"] < now_timestamp:
+            return True
+        if config["isOff"] and config["isOnTill"] > now_timestamp:
+            return True
 
-    return attrs["alarm"] == 0 and attrs["fire"] == 0
+    return False
 
 
 def run(type_of_file):
     logger.warning(f"running bell for lesson {type_of_file}")
 
 
+def run_priority(alarm_type):
+    CONFIG_PATH = os.environ.get("CONFIG_PATH")
+
+    with open(CONFIG_PATH, "r") as config_file:
+        config = json.load(config_file)
+        file = config[f"{alarm_type}Path"]
+        # TODO: Stop sound if playing.
+        run(file)
+
+
 def main(type_of_file: str):
-    dt = datetime.now()
-    if allowed_to_run_bell():
-        run(type_of_file)
-    else:
-        logging.warning("Do not run script. It may be due to alarm.")
-    logger.warning(f"running script for {type_of_file} of the lesson as {dt}")
+    CONFIG_PATH = os.environ.get("CONFIG_PATH")
+
+    with open(CONFIG_PATH, "r") as config_file:
+        config = json.load(config_file)
+        if allowed_to_run_bell(config):
+            file = (
+                config["startLessonPath"]
+                if type_of_file == "start"
+                else config["endLessonPath"]
+            )
+            run(file)
+        else:
+            logger.warning("Do not run script. It may be due to alarm.")
 
 
 if __name__ == "__main__":
