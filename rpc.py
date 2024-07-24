@@ -16,6 +16,10 @@ class OffTill(BaseModel):
     offTill: int
 
 
+class OnTill(BaseModel):
+    onTill: int
+
+
 class Alarm(BaseModel):
     alarm: bool
 

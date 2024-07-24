@@ -12,5 +12,6 @@
   "firePath": "/some/path/to/fire",
   "alarmPath": "/some/path/to/alarm",
   "ambulancePath": "/some/path/to/ambulance",
-  "testPath": "/some/path/to/test"
+  "testPath": "/some/path/to/test",
+  "onTill": 1721888075000
 }
