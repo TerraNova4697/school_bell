@@ -20,6 +20,9 @@ class SchoolBell(TBDeviceMqttClient):
     def listen_rpc(self):
         self.set_server_side_rpc_request_handler(self.handle_server_side_rpc_reqeusts)
 
+    def listen_attributes(self):
+        self.subscribe_to_all_attributes(self.update_attributes)
+
     def handle_server_side_rpc_reqeusts(self, request_id, body):
         method = body["method"]
         params = body["params"]
@@ -46,3 +49,6 @@ class SchoolBell(TBDeviceMqttClient):
         else:
             logger.warning(f"Unknown method for {self.__class__.__name__}: {method}")
             self.send_rpc_reply(request_id, "false")
+
+    def update_attributes(self, result, *args):
+        logger.info(result)

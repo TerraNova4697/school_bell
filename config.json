@@ -1,0 +1,11 @@
+{
+    "attributes": {
+        "alarm": 0,
+        "fire": 0,
+        "ambulance": 0
+    },
+    "mode": {
+        "silent": 0,
+        "silentTill": 0
+    }
+}
