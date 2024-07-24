@@ -1,11 +1,16 @@
 {
-    "attributes": {
-        "alarm": 0,
-        "fire": 0,
-        "ambulance": 0
-    },
-    "mode": {
-        "silent": 0,
-        "silentTill": 0
-    }
+  "isOff": false,
+  "offTill": 1722060879000,
+  "alarm": false,
+  "fire": false,
+  "ambulance": false,
+  "startLessonPath": "/some/path/to/startLesson",
+  "endLessonPath": "/some/path/to/endLesson",
+  "days": 6,
+  "shift1LessonsNum": 8,
+  "shift2LessonsNum": 8,
+  "firePath": "/some/path/to/fire",
+  "alarmPath": "/some/path/to/alarm",
+  "ambulancePath": "/some/path/to/ambulance",
+  "testPath": "/some/path/to/test"
 }

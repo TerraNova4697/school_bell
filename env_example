@@ -1,0 +1,5 @@
+CUBA_URL="your.host.org"
+DEVICE_TOKEN="YOUR_DEVICE_TOKEN"
+USER="user"
+EXEC_SERVICE="/path/to/environment/venv/bin/python"
+EXEC_FILE="/path/to/execution/file/bell.py"
