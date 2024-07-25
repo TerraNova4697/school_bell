@@ -6,6 +6,7 @@ class Lecture(BaseModel):
     start_minute: int
     end_hour: int
     end_minute: int
+    shift: int
 
 
 class UpdateScheduleRPC(BaseModel):

@@ -29,12 +29,26 @@ def parse_args():
         help="Variants: start / end",
         choices=["start", "end"],
     )
+    parser.add_argument_group("required arguments").add_argument(
+        "--schift",
+        type=int,
+        help="Variants: 1 / 2",
+        choices=[1, 2],
+    )
+    parser.add_argument_group("required arguments").add_argument(
+        "--lesson",
+        type=int,
+        help="Number of lesson",
+    )
 
     return parser.parse_args()
 
 
-def allowed_to_run_bell(config) -> bool:
+def allowed_to_run_bell(config, shift, lesson) -> bool:
     now_timestamp = datetime.now().timestamp()
+    if config[f"shift{shift}LessonsNum"] < lesson:
+        return False
+
     if not config["fire"] and not config["alarm"]:
         if not config["isOff"] and config["isOffTill"] < now_timestamp:
             return True
@@ -69,12 +83,12 @@ def stop_priority():
     p.stop_sound()
 
 
-def main(type_of_file: str):
+def main(type_of_file: str, shift: int, lesson: int):
     CONFIG_PATH = os.environ.get("CONFIG_PATH")
 
     with open(CONFIG_PATH, "r") as config_file:
         config = json.load(config_file)
-        if allowed_to_run_bell(config):
+        if allowed_to_run_bell(config, shift, lesson):
             file = (
                 config["startLessonPath"]
                 if type_of_file == "start"
@@ -87,4 +101,4 @@ def main(type_of_file: str):
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args.type)
+    main(args.type, args.shift, args.lesson)
