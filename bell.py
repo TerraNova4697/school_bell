@@ -55,6 +55,11 @@ def run_priority(alarm_type):
         run(file)
 
 
+def stop_priority():
+    # TODO: Stop all priority running files
+    logger.warning("Stopping all priority files.")
+
+
 def main(type_of_file: str):
     CONFIG_PATH = os.environ.get("CONFIG_PATH")
 

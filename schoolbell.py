@@ -6,7 +6,7 @@ from pydantic import ValidationError
 
 from rpc import UpdateScheduleRPC
 import rpc
-from bell import run_priority
+from bell import run_priority, stop_priority
 
 
 logger = logging.getLogger("scheduler_logger")
@@ -98,6 +98,32 @@ class SchoolBell(TBDeviceMqttClient):
         with open(self._config_path, "w") as config_file:
             json.dump(config, config_file, indent=2)
 
+    def handle_server_side_rpc_reqeusts(self, request_id, body):
+        method = body["method"]
+        params = body["params"]
+
+        if method == "updateSchedule":
+            try:
+                UpdateScheduleRPC(**params)
+            except ValidationError as e:
+                logger.exception(str(e))
+                self.send_rpc_reply(
+                    request_id, e.json(include_context=True, include_input=True)
+                )
+                return
+
+            try:
+                self.cron_manager.set_tasks(params["schedule"])
+                self.cron_manager.rewrite_schedule()
+            except Exception:
+                pass
+
+            self.send_rpc_reply(request_id, "true")
+
+        else:
+            logger.warning(f"Unknown method for {self.__class__.__name__}: {method}")
+            self.send_rpc_reply(request_id, "false")
+
     def handle_updated_attribute(self, body, *args):
         try:
             attribute, value = list(body.items())[0]
@@ -119,8 +145,12 @@ class SchoolBell(TBDeviceMqttClient):
 
     def handle_updated_attribute_and_run_alarm(self, body, *args):
         self.handle_updated_attribute(body, args)
-        attribute, _ = list(body.items())[0]
-        run_priority(attribute)
+        attribute, value = list(body.items())[0]
+        logger.info(f"current value of alarm is {value}")
+        if value:
+            run_priority(attribute)
+        else:
+            stop_priority()
 
     def handle_schedule_attribute(self, body, *args):
         try:

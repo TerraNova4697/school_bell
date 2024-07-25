@@ -37,6 +37,7 @@ async def run_server():
         school = SchoolBell(CUBA_URL, SCHOOL_BELL_TOKEN, cron_manager, CONFIG_PATH)
         school.connect()
         school.listen_attributes()
+        school.listen_rpc()
 
         while True:
             await asyncio.sleep(1)
@@ -49,8 +50,11 @@ async def run_server():
         logger.exception(e)
 
     finally:
-        school.unsubscribe_from_all_attributes()
-        school.disconnect()
+        try:
+            school.unsubscribe_from_all_attributes()
+            school.disconnect()
+        except UnboundLocalError:
+            pass
 
 
 if __name__ == "__main__":

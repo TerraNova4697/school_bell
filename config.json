@@ -1,17 +1,17 @@
 {
-  "alarm": false,
   "alarmPath": "/some/path/to/alarm1",
-  "ambulance": false,
-  "ambulancePath": "/some/path/to/ambulance1",
-  "days": 5,
   "endLessonPath": "/some/path/to/endLesson1",
-  "fire": false,
+  "offTill": 1722060870000,
+  "ambulancePath": "/some/path/to/ambulance1",
+  "ambulance": false,
+  "onTill": 1721888070000,
+  "startLessonPath": "/some/path/to/startLesson1",
+  "shift1LessonsNum": 7,
+  "testPath": "/some/path/to/test1",
+  "shift2LessonsNum": 7,
   "firePath": "/some/path/to/fire1",
   "isOff": false,
-  "offTill": 1722060870000,
-  "onTill": 1721888070000,
-  "shift1LessonsNum": 7,
-  "shift2LessonsNum": 7,
-  "startLessonPath": "/some/path/to/startLesson1",
-  "testPath": "/some/path/to/test1"
+  "days": 5,
+  "fire": false,
+  "alarm": false
 }
