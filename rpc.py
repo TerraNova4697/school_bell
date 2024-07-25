@@ -48,6 +48,10 @@ class Fire(BaseModel):
     fire: bool
 
 
+class Test(BaseModel):
+    test: bool
+
+
 class FirePath(BaseModel):
     firePath: str
 

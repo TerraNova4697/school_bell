@@ -1,10 +1,10 @@
 {
-  "alarmPath": "/some/path/to/alarm1",
+  "alarmPath": "/home/nikita/Work/school_scheduler/ring.mp3",
   "endLessonPath": "/some/path/to/endLesson1",
   "offTill": 1722060870000,
   "ambulancePath": "/some/path/to/ambulance1",
-  "ambulance": false,
   "onTill": 1721888070000,
+  "ambulance": false,
   "startLessonPath": "/some/path/to/startLesson1",
   "shift1LessonsNum": 7,
   "testPath": "/some/path/to/test1",
@@ -13,5 +13,6 @@
   "isOff": false,
   "days": 5,
   "fire": false,
+  "test": true,
   "alarm": false
 }

@@ -5,8 +5,11 @@ import json
 
 from datetime import datetime
 
+from player import Player
+
 
 logger = logging.getLogger("scheduler_logger")
+p = Player()
 
 
 def parse_args():
@@ -41,8 +44,13 @@ def allowed_to_run_bell(config) -> bool:
     return False
 
 
-def run(type_of_file):
-    logger.warning(f"running bell for lesson {type_of_file}")
+def run(type_of_file, infinite=False):
+    logger.info(f"running bell for lesson {type_of_file}")
+    p.stop_sound()
+    if infinite:
+        p.start_infinite_sound(type_of_file)
+    else:
+        p.start_sound(type_of_file)
 
 
 def run_priority(alarm_type):
@@ -52,12 +60,13 @@ def run_priority(alarm_type):
         config = json.load(config_file)
         file = config[f"{alarm_type}Path"]
         # TODO: Stop sound if playing.
-        run(file)
+        run(file, infinite=True)
 
 
 def stop_priority():
     # TODO: Stop all priority running files
-    logger.warning("Stopping all priority files.")
+    logger.info("Stopping all priority files.")
+    p.stop_sound()
 
 
 def main(type_of_file: str):

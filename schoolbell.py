@@ -58,6 +58,9 @@ class SchoolBell(TBDeviceMqttClient):
         self._sub_attr_fire = self.subscribe_to_attribute(
             "fire", self.handle_updated_attribute_and_run_alarm
         )
+        self._sub_attr_test = self.subscribe_to_attribute(
+            "test", self.handle_updated_attribute_and_run_alarm
+        )
         self._sub_attr_fire_path = self.subscribe_to_attribute(
             "firePath", self.handle_updated_attribute
         )
