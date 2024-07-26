@@ -27,8 +27,11 @@ class Player:
     def stop_sound(self):
         self._infinite_paying = False
         if self._vlc:
-            # self._vlc.stop()
-            self._vlc = None
+            try:
+                self._vlc.stop()
+                self._vlc = None
+            except Exception as e:
+                print(e)
 
     def start_sound(self, path):
         print(f"Playing sound: {path}")
@@ -36,19 +39,16 @@ class Player:
         self._vlc.play()
 
     async def run_loop(self, file, loop_duration):
-        while True:
+        while self._infinite_paying:
             logger.info("Start playing")
             self._vlc.play()
-            while True:
-                if not self._infinite_paying:
-                    self._vlc.stop()
-                    logger.info("Stop playing")
-                    return
-                await asyncio.sleep(0.5)
             await asyncio.sleep(loop_duration + 0.5)
-            self._vlc.stop()
+            try:
+                self._vlc.stop()
+            except AttributeError:
+                exit()
 
-    def start_infinite_sound(self, path):
+    async def start_infinite_sound(self, path):
         self._infinite_paying = True
         self._vlc = vlc.MediaPlayer(path)
 
@@ -57,14 +57,4 @@ class Player:
         duration = int(audio_info.length)
 
         logger.info(f"DURATION: {duration}")
-        self.start_sound(path)
-
-        # future = asyncio.run(self.run_loop(path, duration))
-        # logger.info(f"result: {retult}")
-
-        # loop.run_until_complete()
-
-        # with audioread.audio_open(path, [wave]) as file:
-        #     print(file.duration)
-        #     logger.info(f"OUTSIDE THE LOOP {self._vlc.is_playing()}")
-        #     self._vlc.play()
+        await self.run_loop(path, duration)

@@ -1,5 +1,6 @@
 import logging
 import json
+from threading import Thread
 
 from crontab import CronTab
 
@@ -46,14 +47,12 @@ class CronManager:
             job = self._cron.new(
                 command=f"{self._exec_service} {self._exec_file} --type start --shift {lesson['shift']} --lesson {lesson_num} >> /home/nikita/Work/school_scheduler/cronjobs.log 2>&1",  # noqa
                 comment="schedule",
-                user="root",
             )
             job.setall(f'{lesson["start_minute"]} {lesson["start_hour"]} * * {new_dow}')
 
             job = self._cron.new(
                 command=f"{self._exec_service} {self._exec_file} --type end --shift {lesson['shift']} --lesson {lesson_num} >> /home/nikita/Work/school_scheduler/cronjobs.log 2>&1",  # noqa
                 comment="schedule",
-                user="root",
             )
             job.setall(f'{lesson["end_minute"]} {lesson["end_hour"]} * * {new_dow}')
 
@@ -63,6 +62,21 @@ class CronManager:
                 shift2_lesson_num += 1
 
         self._cron.write(user=True)
+
+    def run_now(self, attribute):
+
+        self._cron.remove_all(comment="alarm")
+
+        try:
+            job = self._cron.new(
+                command=f"{self._exec_service} /home/nikita/Work/school_scheduler/alarm.py --alarm {attribute} >> /home/nikita/Work/school_scheduler/cronjobs.log 2>&1",  # noqa
+                comment="alarm",
+            )
+            thread = Thread(target=job.run)
+            thread.start()
+            logger.info("task runs")
+        finally:
+            self._cron.remove_all(comment="alarm")
 
     def update_schedule(self, num_of_days):
         jobs = self._cron.find_comment("schedule")

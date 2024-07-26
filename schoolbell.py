@@ -46,7 +46,7 @@ class SchoolBell(TBDeviceMqttClient):
             "alarmPath", self.handle_updated_attribute
         )
         self._sub_attr_ambulance = self.subscribe_to_attribute(
-            "ambulance", self.handle_updated_attribute_and_run_alarm
+            "ambulance", self.handle_updated_attribute
         )
         self._sub_attr_ambulance_path = self.subscribe_to_attribute(
             "ambulancePath", self.handle_updated_attribute
@@ -156,7 +156,7 @@ class SchoolBell(TBDeviceMqttClient):
         attribute, value = list(body.items())[0]
         logger.info(f"current value of alarm is {value}")
         if value:
-            run_priority(attribute)
+            self.cron_manager.run_now(attribute)
         else:
             stop_priority()
 
