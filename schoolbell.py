@@ -1,5 +1,7 @@
 import logging
 import json
+import base64
+import os
 
 from tb_device_mqtt import TBDeviceMqttClient
 from pydantic import ValidationError
@@ -50,7 +52,7 @@ class SchoolBell(TBDeviceMqttClient):
             "ambulancePath", self.handle_updated_attribute
         )
         self._sub_attr_days = self.subscribe_to_attribute(
-            "days", self.handle_updated_attribute
+            "days", self.handle_updated_attribute_and_update_cron
         )
         self._sub_attr_end_lesson_path = self.subscribe_to_attribute(
             "endLessonPath", self.handle_updated_attribute
@@ -78,6 +80,9 @@ class SchoolBell(TBDeviceMqttClient):
         )
         self._sub_attr_test_path = self.subscribe_to_attribute(
             "testPath", self.handle_updated_attribute
+        )
+        self._sub_attr_start_lesson_audio = self.subscribe_to_attribute(
+            "startLessonAudio", self.handle_updated_attribute_and_save_audio
         )
 
     def sliceindex(self, x):
@@ -154,6 +159,43 @@ class SchoolBell(TBDeviceMqttClient):
             run_priority(attribute)
         else:
             stop_priority()
+
+    def handle_updated_attribute_and_save_audio(self, body, *args):
+        attribute, value = list(body.items())[0]
+        b64format_audio = body[attribute]
+
+        try:
+            audio_format = body[attribute].split(";")[0].split("/")[1]
+        except IndexError as e:
+            logger.exception(e)
+
+        logger.info(b64format_audio.split(",")[-1])
+
+        try:
+            file_name = f"{attribute}.{audio_format}"
+            fh = open(file_name, "wb")
+            fh.write(base64.b64decode(b64format_audio.split(",")[-1]))
+            fh.close()
+        except Exception as e:
+            logger.exception(e)
+
+        try:
+            new_path_key = attribute.removesuffix("Audio") + "Path"
+            file_path = (
+                str(os.path.dirname(os.path.abspath(__file__)))
+                + f"/{attribute}.{audio_format}"
+            )
+            self.update_config(new_path_key, file_path)
+        except Exception as e:
+            logger.exception(e)
+
+    def handle_updated_attribute_and_update_cron(self, body, *args):
+        self.handle_updated_attribute(body, args)
+        attribute, value = list(body.items())[0]
+        try:
+            self.cron_manager.update_schedule(value)
+        except Exception as e:
+            logger.exception(e)
 
     def handle_schedule_attribute(self, body, *args):
         try:

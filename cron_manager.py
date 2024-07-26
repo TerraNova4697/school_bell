@@ -7,6 +7,7 @@ logger = logging.getLogger("scheduler_logger")
 
 
 class CronManager:
+    dow = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
     def __init__(
         self,
@@ -36,6 +37,7 @@ class CronManager:
 
         shift1_lesson_num = 1
         shift2_lesson_num = 1
+        new_dow = ",".join(self.dow[: config["days"]])
         for lesson in self._tasks:
             if lesson["shift"] == 1:
                 lesson_num = shift1_lesson_num
@@ -44,21 +46,28 @@ class CronManager:
             job = self._cron.new(
                 command=f"{self._exec_service} {self._exec_file} --type start --shift {lesson['shift']} --lesson {lesson_num} >> /home/nikita/Work/school_scheduler/cronjobs.log 2>&1",  # noqa
                 comment="schedule",
+                user="root",
             )
-            job.setall(
-                f'{lesson["start_minute"]} {lesson["start_hour"]} * * 1-{configs["days"]}'
-            )
+            job.setall(f'{lesson["start_minute"]} {lesson["start_hour"]} * * {new_dow}')
 
             job = self._cron.new(
                 command=f"{self._exec_service} {self._exec_file} --type end --shift {lesson['shift']} --lesson {lesson_num} >> /home/nikita/Work/school_scheduler/cronjobs.log 2>&1",  # noqa
                 comment="schedule",
+                user="root",
             )
-            job.setall(
-                f'{lesson["end_minute"]} {lesson["end_hour"]} * * 1-{configs["days"]}'
-            )
+            job.setall(f'{lesson["end_minute"]} {lesson["end_hour"]} * * {new_dow}')
+
             if lesson["shift"] == 1:
                 shift1_lesson_num += 1
             else:
                 shift2_lesson_num += 1
 
-        self._cron.write()
+        self._cron.write(user=True)
+
+    def update_schedule(self, num_of_days):
+        jobs = self._cron.find_comment("schedule")
+        for job in jobs:
+            logger.info(f"BEFORE {job}")
+            job.dow.on(*self.dow[:num_of_days])
+            self._cron.write()
+            logger.info(f"AFTER {job}")

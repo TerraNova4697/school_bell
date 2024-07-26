@@ -30,7 +30,7 @@ def parse_args():
         choices=["start", "end"],
     )
     parser.add_argument_group("required arguments").add_argument(
-        "--schift",
+        "--shift",
         type=int,
         help="Variants: 1 / 2",
         choices=[1, 2],
@@ -45,25 +45,31 @@ def parse_args():
 
 
 def allowed_to_run_bell(config, shift, lesson) -> bool:
-    now_timestamp = datetime.now().timestamp()
+    now_timestamp = int(datetime.now().timestamp()) * 1000
     if config[f"shift{shift}LessonsNum"] < lesson:
         return False
 
     if not config["fire"] and not config["alarm"]:
-        if not config["isOff"] and config["isOffTill"] < now_timestamp:
+        print(f"{not config['isOff']} and {config['offTill'] < now_timestamp}")
+        print(f"{config['isOff']} and {config['onTill'] > now_timestamp}")
+        print(f"{now_timestamp} | {config['offTill']} | {config['onTill']}")
+        if not config["isOff"] and config["offTill"] < now_timestamp:
             return True
-        if config["isOff"] and config["isOnTill"] > now_timestamp:
+        if config["isOff"] and config["onTill"] > now_timestamp:
             return True
 
     return False
 
 
 def run(type_of_file, infinite=False):
-    logger.info(f"running bell for lesson {type_of_file}")
+    print(f"running bell for lesson {type_of_file}")
     p.stop_sound()
     if infinite:
+        print("Starting infinite sound")
         p.start_infinite_sound(type_of_file)
     else:
+
+        print("Starting finite sound")
         p.start_sound(type_of_file)
 
 
@@ -73,7 +79,7 @@ def run_priority(alarm_type):
     with open(CONFIG_PATH, "r") as config_file:
         config = json.load(config_file)
         file = config[f"{alarm_type}Path"]
-        # TODO: Stop sound if playing.
+
         run(file, infinite=True)
 
 
@@ -84,11 +90,18 @@ def stop_priority():
 
 
 def main(type_of_file: str, shift: int, lesson: int):
-    CONFIG_PATH = os.environ.get("CONFIG_PATH")
+    CONFIG_PATH = os.environ.get(
+        "CONFIG_PATH",
+        default=str(os.path.dirname(os.path.abspath(__file__)) + "/config.json"),
+    )
+
+    # logger.info(f"CONFIG_PATH {CONFIG_PATH}")
+    print(f"CONFIG_PATH {CONFIG_PATH}")
 
     with open(CONFIG_PATH, "r") as config_file:
         config = json.load(config_file)
         if allowed_to_run_bell(config, shift, lesson):
+            logger.warning("run script.")
             file = (
                 config["startLessonPath"]
                 if type_of_file == "start"

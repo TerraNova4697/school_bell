@@ -23,17 +23,20 @@ class CubaRestClient:
 
             attrs = ",".join(list(config.keys()))
 
-        logger.info(f"ATTRIB: {attrs}")
-        with RestClientPE(base_url=self._url) as rest_client:
-            try:
-                # Auth with credentials
-                rest_client.login(username=self._username, password=self._password)
+            logger.info(f"ATTRIB: {attrs}")
+            with RestClientPE(base_url=self._url) as rest_client:
+                try:
+                    # Auth with credentials
+                    rest_client.login(username=self._username, password=self._password)
 
-                attributes = rest_client.get_device_attributes(
-                    device, shared_keys=attrs, client_keys=""
-                )
-                with open(self._config_path, "w") as config_file:
-                    json.dump(attributes["shared"], config_file, indent=2)
+                    attributes = rest_client.get_device_attributes(
+                        device, shared_keys=attrs, client_keys=""
+                    )
+                    with open(self._config_path, "w") as config_file:
+                        shared_attrs = attributes["shared"]
+                        for k, v in shared_attrs.items():
+                            config[k] = v
+                        json.dump(config, config_file, indent=2)
 
-            except ApiException as e:
-                logger.exception(e)
+                except ApiException as e:
+                    logger.exception(e)
