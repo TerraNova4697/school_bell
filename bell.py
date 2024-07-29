@@ -50,13 +50,21 @@ def allowed_to_run_bell(config, shift, lesson) -> bool:
         return False
 
     if not config["fire"] and not config["alarm"]:
-        print(f"{not config['isOff']} and {config['offTill'] < now_timestamp}")
-        print(f"{config['isOff']} and {config['onTill'] > now_timestamp}")
-        print(f"{now_timestamp} | {config['offTill']} | {config['onTill']}")
-        if not config["isOff"] and config["offTill"] < now_timestamp:
+        # print(f"{not config['isOff']} and {config['offTill'] < now_timestamp}")
+        # print(f"{config['isOff']} and {config['onTill'] > now_timestamp}")
+        # print(f"{now_timestamp} | {config['offTill']} | {config['onTill']}")
+
+        if config["isOnFor"][0] < now_timestamp < config["isOnFor"][1]:
             return True
-        if config["isOff"] and config["onTill"] > now_timestamp:
+        if (
+            not config["isOff"]
+            and not config["isOffFor"][0] < now_timestamp < config["isOffFor"]
+        ):
             return True
+        # if not config["isOff"] and config["offTill"] < now_timestamp:
+        #     return True
+        # if config["isOff"] and config["onTill"] > now_timestamp:
+        #     return True
 
     return False
 

@@ -2,13 +2,14 @@ import logging
 import json
 import base64
 import os
+import datetime
 
 from tb_device_mqtt import TBDeviceMqttClient
 from pydantic import ValidationError
 
 from rpc import UpdateScheduleRPC
 import rpc
-from bell import run_priority, stop_priority
+from bell import stop_priority
 
 
 logger = logging.getLogger("scheduler_logger")
@@ -33,12 +34,12 @@ class SchoolBell(TBDeviceMqttClient):
         self._sub_attr_schedule = self.subscribe_to_attribute(
             "schedule", self.handle_schedule_attribute
         )
-        self._sub_attr_off_till = self.subscribe_to_attribute(
-            "offTill", self.handle_updated_attribute
-        )
-        self._sub_attr_on_till = self.subscribe_to_attribute(
-            "onTill", self.handle_updated_attribute
-        )
+        # self._sub_attr_off_till = self.subscribe_to_attribute(
+        #     "offTill", self.handle_updated_attribute
+        # )
+        # self._sub_attr_on_till = self.subscribe_to_attribute(
+        #     "onTill", self.handle_updated_attribute
+        # )
         self._sub_attr_alarm = self.subscribe_to_attribute(
             "alarm", self.handle_updated_attribute_and_run_alarm
         )
@@ -106,9 +107,22 @@ class SchoolBell(TBDeviceMqttClient):
         with open(self._config_path, "w") as config_file:
             json.dump(config, config_file, indent=2)
 
+    def get_day_midnight(self, days: int | None = None):
+        """Returns a datetime object for the start of the next day (00:00)."""
+        today = datetime.date.today()
+        target_day = today + datetime.timedelta(days=1)
+        if days:
+            target_day = target_day + datetime.timedelta(days=days)
+        return datetime.datetime(target_day.year, target_day.month, target_day.day)
+
+    def get_readable_dt(self, dt: datetime.datetime) -> str:
+        return dt.strftime("%d.%m.%Y %H:%M")
+
     def handle_server_side_rpc_reqeusts(self, request_id, body):
         method = body["method"]
         params = body["params"]
+
+        logger.warning(body)
 
         if method == "updateSchedule":
             try:
@@ -127,6 +141,42 @@ class SchoolBell(TBDeviceMqttClient):
                 pass
 
             self.send_rpc_reply(request_id, "true")
+
+        elif method == "turnOffFor":
+            days = params["days"]
+
+            start_midnight = self.get_day_midnight()
+            end_midnight = self.get_day_midnight(days)
+
+            self.update_config(
+                "offFor",
+                [
+                    int(1000 * start_midnight.timestamp()),
+                    int(1000 * end_midnight.timestamp()),
+                ],
+            )
+
+            response_text = f"Отключен с {self.get_readable_dt(start_midnight)} по {self.get_readable_dt(end_midnight)}"
+            logger.info(response_text)
+            self.send_rpc_reply(request_id, json.dumps({"message": response_text}))
+
+        elif method == "turnOnFor":
+            days = params["days"]
+
+            start_midnight = self.get_day_midnight()
+            end_midnight = self.get_day_midnight(days)
+
+            self.update_config(
+                "onFor",
+                [
+                    int(1000 * start_midnight.timestamp()),
+                    int(1000 * end_midnight.timestamp()),
+                ],
+            )
+
+            response_text = f"Включен с {self.get_readable_dt(start_midnight)} по {self.get_readable_dt(end_midnight)}"
+            logger.info(response_text)
+            self.send_rpc_reply(request_id, json.dumps({"message": response_text}))
 
         else:
             logger.warning(f"Unknown method for {self.__class__.__name__}: {method}")
