@@ -1,0 +1,10 @@
+[Unit]
+Description=School bell automation by Cuba IoT
+
+[Service]
+WorkingDirectory=/cuba/school-bell
+ExecStart=/usr/bin/python3 /cuba/school-bell/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
