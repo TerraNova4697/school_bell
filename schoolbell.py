@@ -43,30 +43,30 @@ class SchoolBell(TBDeviceMqttClient):
         self._sub_attr_alarm = self.subscribe_to_attribute(
             "alarm", self.handle_updated_attribute_and_run_alarm
         )
-        self._sub_attr_alarm_path = self.subscribe_to_attribute(
-            "alarmPath", self.handle_updated_attribute
-        )
+        # self._sub_attr_alarm_path = self.subscribe_to_attribute(
+        #     "alarmPath", self.handle_updated_attribute
+        # )
         self._sub_attr_ambulance = self.subscribe_to_attribute(
             "ambulance", self.handle_updated_attribute
         )
-        self._sub_attr_ambulance_path = self.subscribe_to_attribute(
-            "ambulancePath", self.handle_updated_attribute
-        )
+        # self._sub_attr_ambulance_path = self.subscribe_to_attribute(
+        #     "ambulancePath", self.handle_updated_attribute
+        # )
         self._sub_attr_days = self.subscribe_to_attribute(
             "days", self.handle_updated_attribute_and_update_cron
         )
-        self._sub_attr_end_lesson_path = self.subscribe_to_attribute(
-            "endLessonPath", self.handle_updated_attribute
-        )
+        # self._sub_attr_end_lesson_path = self.subscribe_to_attribute(
+        #     "endLessonPath", self.handle_updated_attribute
+        # )
         self._sub_attr_fire = self.subscribe_to_attribute(
             "fire", self.handle_updated_attribute_and_run_alarm
         )
         self._sub_attr_test = self.subscribe_to_attribute(
             "test", self.handle_updated_attribute_and_run_alarm
         )
-        self._sub_attr_fire_path = self.subscribe_to_attribute(
-            "firePath", self.handle_updated_attribute
-        )
+        # self._sub_attr_fire_path = self.subscribe_to_attribute(
+        #     "firePath", self.handle_updated_attribute
+        # )
         self._sub_attr_is_off = self.subscribe_to_attribute(
             "isOff", self.handle_updated_attribute
         )
@@ -76,14 +76,26 @@ class SchoolBell(TBDeviceMqttClient):
         self._sub_attr_shift2_lessons_num = self.subscribe_to_attribute(
             "shift2LessonsNum", self.handle_updated_attribute
         )
-        self._sub_attr_start_lessons_path = self.subscribe_to_attribute(
-            "startLessonPath", self.handle_updated_attribute
-        )
-        self._sub_attr_test_path = self.subscribe_to_attribute(
-            "testPath", self.handle_updated_attribute
-        )
+        # self._sub_attr_start_lessons_path = self.subscribe_to_attribute(
+        #     "startLessonPath", self.handle_updated_attribute
+        # )
+        # self._sub_attr_test_path = self.subscribe_to_attribute(
+        #     "testPath", self.handle_updated_attribute
+        # )
         self._sub_attr_start_lesson_audio = self.subscribe_to_attribute(
             "startLessonAudio", self.handle_updated_attribute_and_save_audio
+        )
+        self._sub_attr_start_lesson_audio = self.subscribe_to_attribute(
+            "endLessonAudio", self.handle_updated_attribute_and_save_audio
+        )
+        self._sub_attr_start_lesson_audio = self.subscribe_to_attribute(
+            "alarmAudio", self.handle_updated_attribute_and_save_audio
+        )
+        self._sub_attr_start_lesson_audio = self.subscribe_to_attribute(
+            "fireAudio", self.handle_updated_attribute_and_save_audio
+        )
+        self._sub_attr_start_lesson_audio = self.subscribe_to_attribute(
+            "testAudio", self.handle_updated_attribute_and_save_audio
         )
 
     def sliceindex(self, x):
