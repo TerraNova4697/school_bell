@@ -29,6 +29,7 @@ class CubaRestClient:
                     # Auth with credentials
                     rest_client.login(username=self._username, password=self._password)
 
+                    attrs = "offTill,shift1LessonsNum,test,shift2LessonsNum,alarm,isOff,days,fire,onTill,ambulance,offFor,onFor"  # ,alarmAudio"  # ,fireAudio,testAudio,endLessonAudio,startLessonAudio"
                     attributes = rest_client.get_device_attributes(
                         device, shared_keys=attrs, client_keys=""
                     )
