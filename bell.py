@@ -58,7 +58,7 @@ def allowed_to_run_bell(config, shift, lesson) -> bool:
             return True
         if (
             not config["isOff"]
-            and not config["isOffFor"][0] < now_timestamp < config["isOffFor"]
+            and not config["isOffFor"][0] < now_timestamp < config["isOffFor"][1]
         ):
             return True
         # if not config["isOff"] and config["offTill"] < now_timestamp:
@@ -77,7 +77,7 @@ def run(type_of_file, infinite=False):
         p.start_infinite_sound(type_of_file)
     else:
 
-        print("Starting finite sound")
+        print("Starting finite sound", datetime.now())
         p.start_sound(type_of_file)
 
 

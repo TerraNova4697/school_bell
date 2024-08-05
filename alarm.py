@@ -58,5 +58,8 @@ async def main(type_of_alarm):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    asyncio.run(main(args.alarm))
+    try:
+        args = parse_args()
+        asyncio.run(main(args.alarm))
+    finally:
+        exit()

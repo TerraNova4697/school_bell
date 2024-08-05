@@ -195,28 +195,30 @@ class SchoolBell(TBDeviceMqttClient):
             self.send_rpc_reply(request_id, "false")
 
     def handle_updated_attribute(self, body, *args):
-        try:
-            attribute, value = list(body.items())[0]
-            class_name = self.upperfirst(attribute)
-        except AttributeError as e:
-            logger.exception(e)
+        for i in range(len(body)):
+            try:
+                attribute, value = list(body.items())[i]
+                logger.info(f"updating attribute {attribute}, body is {body}")
+                class_name = self.upperfirst(attribute)
+            except AttributeError as e:
+                logger.exception(e)
 
-        try:
-            attr_class = getattr(rpc, class_name)
-            attr_class(**body)
-        except ValidationError as e:
-            logger.exception(str(e))
-            return
+            try:
+                attr_class = getattr(rpc, class_name)
+                attr_class(**body)
+            except ValidationError as e:
+                logger.exception(str(e))
+                return
 
-        try:
-            self.update_config(attribute, value)
-        except Exception as e:
-            logger.exception(e)
+            try:
+                self.update_config(attribute, value)
+            except Exception as e:
+                logger.exception(e)
 
     def handle_updated_attribute_and_run_alarm(self, body, *args):
         self.handle_updated_attribute(body, args)
         attribute, value = list(body.items())[0]
-        logger.info(f"current value of alarm is {value}")
+        logger.info(f"current value of {attribute} is {value}")
         if value:
             self.cron_manager.run_now(attribute)
         else:
@@ -231,10 +233,13 @@ class SchoolBell(TBDeviceMqttClient):
         except IndexError as e:
             logger.exception(e)
 
-        logger.info(b64format_audio.split(",")[-1])
+        # logger.info(b64format_audio.split(",")[-1])
 
         try:
             file_name = f"{attribute}.{audio_format}"
+            # Delete old file if exists.
+            os.remove(file_name)
+            # Save new file.
             fh = open(file_name, "wb")
             fh.write(base64.b64decode(b64format_audio.split(",")[-1]))
             fh.close()
@@ -261,13 +266,13 @@ class SchoolBell(TBDeviceMqttClient):
 
     def handle_schedule_attribute(self, body, *args):
         try:
-            UpdateScheduleRPC(**body)
+            UpdateScheduleRPC(**body['schedule'])
         except ValidationError as e:
             logger.exception(str(e))
             return
-
+        logger.info(body)
         try:
-            self.cron_manager.set_tasks(body["schedule"])
+            self.cron_manager.set_tasks(body["schedule"]["schedule"])
             self.cron_manager.rewrite_schedule()
         except Exception as e:
             logger.exception(e)

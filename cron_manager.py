@@ -19,7 +19,7 @@ class CronManager:
     ):
         self._user = user
         self._cron = CronTab(
-            user=True, log="/home/nikita/Work/school_scheduler/cronjobs.log"
+            user=True, log="/school-bell/cronjobs.log"
         )
         self._exec_service = exec_service
         self._exec_file = exec_file
@@ -40,19 +40,24 @@ class CronManager:
         shift2_lesson_num = 1
         new_dow = ",".join(self.dow[: config["days"]])
         for lesson in self._tasks:
+            logger.info(lesson)
             if lesson["shift"] == 1:
                 lesson_num = shift1_lesson_num
             else:
                 lesson_num = shift2_lesson_num
+
+            lesson_shift = lesson['shift']
             job = self._cron.new(
-                command=f"{self._exec_service} {self._exec_file} --type start --shift {lesson['shift']} --lesson {lesson_num} >> /home/nikita/Work/school_scheduler/cronjobs.log 2>&1",  # noqa
+                command=f'su cuba -c "{self._exec_service} {self._exec_file} --type start --shift {lesson_shift} --lesson {lesson_num} >> /school-bell/cronjobs.log 2>&1"',  # noqa
                 comment="schedule",
+                user=self._user,
             )
             job.setall(f'{lesson["start_minute"]} {lesson["start_hour"]} * * {new_dow}')
 
             job = self._cron.new(
-                command=f"{self._exec_service} {self._exec_file} --type end --shift {lesson['shift']} --lesson {lesson_num} >> /home/nikita/Work/school_scheduler/cronjobs.log 2>&1",  # noqa
+                command=f'su cuba -c "{self._exec_service} {self._exec_file} --type end --shift {lesson_shift} --lesson {lesson_num} >> /school-bell/cronjobs.log 2>&1"',  # noqa
                 comment="schedule",
+                user=self._user,
             )
             job.setall(f'{lesson["end_minute"]} {lesson["end_hour"]} * * {new_dow}')
 
@@ -69,9 +74,12 @@ class CronManager:
 
         try:
             job = self._cron.new(
-                command=f"{self._exec_service} /home/nikita/Work/school_scheduler/alarm.py --alarm {attribute} >> /home/nikita/Work/school_scheduler/cronjobs.log 2>&1",  # noqa
+                command=f'su cuba  -c "{self._exec_service} /school-bell/alarm.py --alarm {attribute} >> /school-bell/cronjobs.log 2>&1"',  # noqa
                 comment="alarm",
+                user=self._user,
             )
+            # job.setall("0 0 * * *")
+            # self._cron.write(user=True)
             thread = Thread(target=job.run)
             thread.start()
             logger.info("task runs")
@@ -82,6 +90,9 @@ class CronManager:
         jobs = self._cron.find_comment("schedule")
         for job in jobs:
             logger.info(f"BEFORE {job}")
-            job.dow.on(*self.dow[:num_of_days])
-            self._cron.write()
+            try:
+                job.dow.on(*self.dow[:num_of_days])
+            except Exception as e:
+                logger.info(e)
+            self._cron.write(user=True)
             logger.info(f"AFTER {job}")

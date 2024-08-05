@@ -19,11 +19,13 @@ class CubaRestClient:
     def get_device_attributes(self, device):
         attrs = ""
         with open(self._config_path, "r") as config_file:
-            config = json.load(config_file)
+            logger.info(config_file)
+            logger.info(self._config_path)
+            config = json.loads(config_file.read())
 
-            attrs = ",".join(list(config.keys()))
+            # attrs = ",".join(list(config.keys()))
 
-            logger.info(f"ATTRIB: {attrs}")
+            # logger.info(f"ATTRIB: {attrs}")
             with RestClientPE(base_url=self._url) as rest_client:
                 try:
                     # Auth with credentials

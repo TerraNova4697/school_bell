@@ -1,5 +1,6 @@
 import logging
 import asyncio
+import time
 
 import vlc
 from mutagen.mp3 import MP3
@@ -37,9 +38,12 @@ class Player:
         print(f"Playing sound: {path}")
         self._vlc = vlc.MediaPlayer(path)
         self._vlc.play()
+        time.sleep(10)
+        print("Sound played")
 
     async def run_loop(self, file, loop_duration):
         while self._infinite_paying:
+            print("Start playing")
             logger.info("Start playing")
             self._vlc.play()
             await asyncio.sleep(loop_duration + 0.5)
@@ -56,5 +60,6 @@ class Player:
         audio_info = audio.info
         duration = int(audio_info.length)
 
+        print(f"DURATION: {duration}")
         logger.info(f"DURATION: {duration}")
         await self.run_loop(path, duration)
