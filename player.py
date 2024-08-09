@@ -53,6 +53,7 @@ class Player:
                 exit()
 
     async def start_infinite_sound(self, path):
+        print('starting inf loop')
         self._infinite_paying = True
         self._vlc = vlc.MediaPlayer(path)
 

@@ -3,26 +3,18 @@
   "shift1LessonsNum": 8,
   "startLessonPath": "/school-bell/startLessonAudio.mpeg",
   "endLessonPath": "/school-bell/startLessonAudio.mpeg",
-  "alarmPath": "/school-bell/alarmAudio.mpeg",
+  "alarmPath": "/school-bell/startLessonAudio.mpeg",
   "firePath": "/school-bell/fireAudio.mpeg",
   "ambulancePath": "/school-bell/startLessonAudio.mpeg",
-  "testPath": "/school-bell/testAudio.mpeg",
+  "testPath": "/school-bell/startLessonAudio.mpeg",
   "test": false,
   "shift2LessonsNum": 8,
   "alarm": false,
   "isOff": false,
-  "days": 6,
-  "fire": false,
+  "days": 5,
+  "fire": true,
   "onTill": 1721888070000,
   "ambulance": false,
   "offFor": 0,
-  "onFor": 0,
-  "isOnFor": [
-    0,
-    0
-  ],
-  "isOffFor": [
-    0,
-    0
-  ]
+  "onFor": 0
 }

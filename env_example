@@ -1,8 +1,0 @@
-CUBA_URL="your.host.org"
-CUBA_USER_EMAIL="YOUR_CUBA_USER_EMAIL"
-CUBA_USER_PASSWORD="YOUR_CUBA_USER_PASSWORD"
-DEVICE_TOKEN="YOUR_DEVICE_TOKEN"
-USER="user"
-EXEC_SERVICE="/path/to/environment/venv/bin/python"
-EXEC_FILE="/path/to/execution/file/bell.py"
-CONFIG_PATH="/path/to/config/config.json"
