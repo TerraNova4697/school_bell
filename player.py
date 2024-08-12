@@ -41,12 +41,18 @@ class Player:
         time.sleep(10)
         print("Sound played")
 
-    async def run_loop(self, file, loop_duration):
+    async def run_loop(self, file):
         while self._infinite_paying:
             print("Start playing")
             logger.info("Start playing")
-            self._vlc.play()
-            await asyncio.sleep(loop_duration + 0.5)
+            #self._vlc.play()
+            #await asyncio.sleep(loop_duration + 0.5)
+            try:
+                p = await asyncio.create_subprocess_exec('play', file)
+                await p.wait()
+            except Exception as e:
+                print(e)
+                p.terminate()
             try:
                 self._vlc.stop()
             except AttributeError:
@@ -55,12 +61,12 @@ class Player:
     async def start_infinite_sound(self, path):
         print('starting inf loop')
         self._infinite_paying = True
-        self._vlc = vlc.MediaPlayer(path)
+#        self._vlc = vlc.MediaPlayer(path)
 
-        audio = self.get_decoder(path)(path)
-        audio_info = audio.info
-        duration = int(audio_info.length)
+#        audio = self.get_decoder(path)(path)
+#        audio_info = audio.info
+#        duration = int(audio_info.length)
 
-        print(f"DURATION: {duration}")
-        logger.info(f"DURATION: {duration}")
-        await self.run_loop(path, duration)
+#        print(f"DURATION: {duration}")
+#        logger.info(f"DURATION: {duration}")
+        await self.run_loop(path)

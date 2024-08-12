@@ -238,7 +238,10 @@ class SchoolBell(TBDeviceMqttClient):
         try:
             file_name = f"{attribute}.{audio_format}"
             # Delete old file if exists.
-            os.remove(file_name)
+            try:
+                os.remove(file_name)
+            except Exception as e:
+                print(e)
             # Save new file.
             fh = open(file_name, "wb")
             fh.write(base64.b64decode(b64format_audio.split(",")[-1]))
