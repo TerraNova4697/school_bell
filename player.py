@@ -34,21 +34,28 @@ class Player:
             except Exception as e:
                 print(e)
 
-    def start_sound(self, path):
+    async def start_sound(self, path):
         print(f"Playing sound: {path}")
-        self._vlc = vlc.MediaPlayer(path)
-        self._vlc.play()
-        time.sleep(10)
+        try:
+            p = await asyncio.create_subprocess_exec("play", path)
+            await p.wait()
+        except Exception as e:
+            print(e)
+            p.terminate()
+        try:
+            self._vlc.stop()
+        except AttributeError:
+            exit()
         print("Sound played")
 
     async def run_loop(self, file):
         while self._infinite_paying:
             print("Start playing")
             logger.info("Start playing")
-            #self._vlc.play()
-            #await asyncio.sleep(loop_duration + 0.5)
+            # self._vlc.play()
+            # await asyncio.sleep(loop_duration + 0.5)
             try:
-                p = await asyncio.create_subprocess_exec('play', file)
+                p = await asyncio.create_subprocess_exec("play", file)
                 await p.wait()
             except Exception as e:
                 print(e)
@@ -59,14 +66,14 @@ class Player:
                 exit()
 
     async def start_infinite_sound(self, path):
-        print('starting inf loop')
+        print("starting inf loop")
         self._infinite_paying = True
-#        self._vlc = vlc.MediaPlayer(path)
+        #        self._vlc = vlc.MediaPlayer(path)
 
-#        audio = self.get_decoder(path)(path)
-#        audio_info = audio.info
-#        duration = int(audio_info.length)
+        #        audio = self.get_decoder(path)(path)
+        #        audio_info = audio.info
+        #        duration = int(audio_info.length)
 
-#        print(f"DURATION: {duration}")
-#        logger.info(f"DURATION: {duration}")
+        #        print(f"DURATION: {duration}")
+        #        logger.info(f"DURATION: {duration}")
         await self.run_loop(path)

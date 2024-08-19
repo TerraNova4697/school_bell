@@ -2,6 +2,7 @@ import logging
 import argparse
 import os
 import json
+import asyncio
 
 from datetime import datetime
 
@@ -69,7 +70,7 @@ def allowed_to_run_bell(config, shift, lesson) -> bool:
     return False
 
 
-def run(type_of_file, infinite=False):
+async def run(type_of_file, infinite=False):
     print(f"running bell for lesson {type_of_file}")
     p.stop_sound()
     if infinite:
@@ -78,7 +79,7 @@ def run(type_of_file, infinite=False):
     else:
 
         print("Starting finite sound", datetime.now())
-        p.start_sound(type_of_file)
+        await p.start_sound(type_of_file)
 
 
 def run_priority(alarm_type):
@@ -97,7 +98,7 @@ def stop_priority():
     p.stop_sound()
 
 
-def main(type_of_file: str, shift: int, lesson: int):
+async def main(type_of_file: str, shift: int, lesson: int):
     CONFIG_PATH = os.environ.get(
         "CONFIG_PATH",
         default=str(os.path.dirname(os.path.abspath(__file__)) + "/config.json"),
@@ -115,11 +116,11 @@ def main(type_of_file: str, shift: int, lesson: int):
                 if type_of_file == "start"
                 else config["endLessonPath"]
             )
-            run(file)
+            await run(file)
         else:
             logger.warning("Do not run script. It may be due to alarm.")
 
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args.type, args.shift, args.lesson)
+    asyncio.run(main(args.type, args.shift, args.lesson))
