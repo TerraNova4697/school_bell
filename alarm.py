@@ -7,10 +7,14 @@ import asyncio
 from player import Player
 
 
+
+
+
 logger = logging.getLogger("scheduler_logger")
 p = Player()
 
-
+print('in alarm')
+logger.info('in alarm')
 def parse_args():
     """Parse arguments from command line.
 
@@ -39,7 +43,7 @@ async def monitor_status():
         ) as config_file:
             config = json.load(config_file)
             if not config["alarm"] and not config["fire"] and not config["test"]:
-                p.stop_sound()
+                p.p.terminate()
                 exit()
             else:
                 await asyncio.sleep(0.5)
@@ -47,13 +51,13 @@ async def monitor_status():
 
 async def main(type_of_alarm):
     asyncio.create_task(monitor_status())
-
+    print('in main')
     with open(
         os.path.dirname(os.path.abspath(__file__)) + "/config.json", "r"
     ) as config_file:
         config = json.load(config_file)
         file = config[f"{type_of_alarm}Path"]
-
+        print('starting inf loop')
         await p.start_infinite_sound(path=file)
 
 

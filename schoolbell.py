@@ -3,6 +3,7 @@ import json
 import base64
 import os
 import datetime
+import requests
 
 from tb_device_mqtt import TBDeviceMqttClient
 from pydantic import ValidationError
@@ -136,6 +137,14 @@ class SchoolBell(TBDeviceMqttClient):
 
         logger.warning(body)
 
+        if method == "send_alarm_to_egsv":
+            logger.info("have to send alarm to EGSV")
+            res = requests.get("http://10.0.67.130:4080/webhook/xnsfjjfbrj")
+            try:
+                logger.info(res.text)
+            except Exception as e:
+                logger.info(e)
+
         if method == "updateSchedule":
             try:
                 UpdateScheduleRPC(**params)
@@ -195,7 +204,28 @@ class SchoolBell(TBDeviceMqttClient):
             self.send_rpc_reply(request_id, "false")
 
     def handle_updated_attribute(self, body, *args):
+        try:
+            body.pop('button_1')
+        except:
+            pass
+
+        try:
+            body.pop('button_2')
+        except:
+            pass
+
+        try:
+            body.pop('button_3')
+        except:
+            pass
+
+        try:
+            body.pop('fill_empty')
+        except:
+            pass
+
         for i in range(len(body)):
+
             try:
                 attribute, value = list(body.items())[i]
                 logger.info(f"updating attribute {attribute}, body is {body}")
@@ -206,6 +236,8 @@ class SchoolBell(TBDeviceMqttClient):
             try:
                 attr_class = getattr(rpc, class_name)
                 attr_class(**body)
+            except AttributeError as e:
+                logger.exception(str(e))
             except ValidationError as e:
                 logger.exception(str(e))
                 return
@@ -238,7 +270,10 @@ class SchoolBell(TBDeviceMqttClient):
         try:
             file_name = f"{attribute}.{audio_format}"
             # Delete old file if exists.
-            os.remove(file_name)
+            try:
+                os.remove(file_name)
+            except Exception as e:
+                print(e)
             # Save new file.
             fh = open(file_name, "wb")
             fh.write(base64.b64decode(b64format_audio.split(",")[-1]))

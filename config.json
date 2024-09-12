@@ -1,14 +1,14 @@
 {
   "offTill": 1721876500000,
-  "shift1LessonsNum": 8,
-  "startLessonPath": "/school-bell/startLessonAudio.mpeg",
-  "endLessonPath": "/school-bell/startLessonAudio.mpeg",
-  "alarmPath": "/school-bell/alarmAudio.mpeg",
-  "firePath": "/school-bell/fireAudio.mpeg",
-  "ambulancePath": "/school-bell/startLessonAudio.mpeg",
-  "testPath": "/school-bell/testAudio.mpeg",
+  "shift1LessonsNum": 4,
+  "startLessonPath": "/school-bell/startLessonAudio.mp3",
+  "endLessonPath": "/school-bell/startLessonAudio.mp3",
+  "alarmPath": "/school-bell/startLessonAudio.mp3",
+  "firePath": "/school-bell/fireAudio.mp3",
+  "ambulancePath": "/school-bell/startLessonAudio.mp3",
+  "testPath": "/school-bell/startLessonAudio.mp3",
   "test": false,
-  "shift2LessonsNum": 8,
+  "shift2LessonsNum": 3,
   "alarm": false,
   "isOff": false,
   "days": 6,
@@ -24,5 +24,7 @@
   "isOffFor": [
     0,
     0
-  ]
+  ],
+  "button_1": 0,
+  "fill_empty": true
 }
