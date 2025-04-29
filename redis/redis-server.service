@@ -1,0 +1,17 @@
+[Unit]
+Description=Redis Server (custom from /opt/redis)
+After=network.target
+
+[Service]
+Type=simple
+User=cuba
+Group=cuba
+ExecStart=/opt/redis/bin/redis-server /etc/redis/6379.conf
+ExecStop=/opt/redis/bin/redis-cli shutdown
+Restart=always
+
+# Важно: указать рабочий каталог, если используется относительный путь в redis.conf
+WorkingDirectory=/opt/redis/var/
+
+[Install]
+WantedBy=multi-user.target
