@@ -3,7 +3,7 @@ Description=Alarm Killer Daemon
 After=network.target
 
 [Service]
-ExecStart=/home/cuba/school_bell/.venv/bin/python3 /home/cuba/school_bell/main.py
+ExecStart=/home/cuba/school_bell/.venv/bin/python3 /home/cuba/school_bell/ps_killer/ps_killer.py
 Restart=always
 RestartSec=3
 

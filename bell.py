@@ -7,9 +7,12 @@ from datetime import datetime
 
 from player import Player
 
+import redis
+
 
 logger = logging.getLogger("scheduler_logger")
 p = Player()
+_redis = redis.Redis(db=0)
 
 
 def parse_args():
@@ -49,7 +52,10 @@ def allowed_to_run_bell(config, shift, lesson) -> bool:
     if config[f"shift{shift}LessonsNum"] < lesson:
         return False
 
-    if not config["fire"] and not config["alarm"]:
+    fire = int(_redis.get("fire").decode())
+    alarm = int(_redis.get("alarm").decode())
+
+    if not fire and not alarm:
         # print(f"{not config['isOff']} and {config['offTill'] < now_timestamp}")
         # print(f"{config['isOff']} and {config['onTill'] > now_timestamp}")
         # print(f"{now_timestamp} | {config['offTill']} | {config['onTill']}")

@@ -11,6 +11,8 @@ from rpc import UpdateScheduleRPC
 import rpc
 from bell import stop_priority
 
+import redis
+
 
 logger = logging.getLogger("scheduler_logger")
 
@@ -22,6 +24,7 @@ class SchoolBell(TBDeviceMqttClient):
         self.token = token
         self.cron_manager = cron_manager
         self._config_path = config_path
+        self._redis = redis.Redis(db=0)
         super().__init__(self.url, username=self.token)
 
     def listen_rpc(self):
@@ -113,6 +116,10 @@ class SchoolBell(TBDeviceMqttClient):
     def update_config(self, key: str, value) -> None:
         config = None
         # TODO: Update Redis value
+        logger.info(f"KEEEEY: {key}:{value}")
+        if key in ["test", "alarm", "fire", "ambulance"]:
+            res = self._redis.set(key, "1" if value else "0")
+            logger.info(f"RES {res}")
         with open(self._config_path, "r") as config_file:
             config = json.load(config_file)
             config[key] = value
@@ -239,19 +246,26 @@ class SchoolBell(TBDeviceMqttClient):
         try:
             file_name = f"{attribute}.{audio_format}"
             # Delete old file if exists.
-            os.remove(file_name)
+            try:
+                os.remove(f"/usr/share/school_bell/{file_name}")
+            except:
+                pass
             # Save new file.
-            fh = open(file_name, "wb")
-            fh.write(base64.b64decode(b64format_audio.split(",")[-1]))
-            fh.close()
+            try:
+                fh = open(f"/usr/share/school_bell/{file_name}", "wb")
+                fh.write(base64.b64decode(b64format_audio.split(",")[-1]))
+                fh.close()
+            except Exception as e:
+                logger.exception(e)
         except Exception as e:
             logger.exception(e)
 
         try:
             new_path_key = attribute.removesuffix("Audio") + "Path"
             file_path = (
-                str(os.path.dirname(os.path.abspath(__file__)))
-                + f"/{attribute}.{audio_format}"
+                # str(os.path.dirname(os.path.abspath(__file__)))
+                "/usr/share/school_bell" + \
+                f"/{attribute}.{audio_format}"
             )
             self.update_config(new_path_key, file_path)
         except Exception as e:

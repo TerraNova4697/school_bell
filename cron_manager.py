@@ -2,6 +2,7 @@ import logging
 import json
 from threading import Thread
 
+import redis
 from crontab import CronTab
 
 logger = logging.getLogger("scheduler_logger")
@@ -25,6 +26,7 @@ class CronManager:
         self._exec_file = exec_file
         self._tasks = None
         self._config_path = config_path
+        self._redis = redis.Redis(db=0)
 
     def set_tasks(self, tasks):
         self._tasks = tasks
