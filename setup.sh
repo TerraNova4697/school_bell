@@ -2,13 +2,13 @@
 
 set -e
 
-mv evn_example .env
+mv env_example .env
 
 sudo mkdir -p /usr/share/school_bell && sudo chown -R cuba:cuba /usr/share/school_bell
 sudo mkdir -p /var/log/school_bell && sudo chown -R cuba:cuba /var/log/school_bell
 
 sudo apt update && sudo apt install python3-pip python3.12-venv vlc \
-    libvlc-dev python3-vlc alsa-utils pulseaudio sox libsox-fmt-all
+    libvlc-dev python3-vlc alsa-utils pulseaudio sox libsox-fmt-all -y
 
 cp defaultAudio.mp3 /usr/share/school_bell/startLessonAudio.mp3
 cp defaultAudio.mp3 /usr/share/school_bell/endLessonAudio.mp3

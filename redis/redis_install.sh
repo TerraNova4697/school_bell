@@ -23,8 +23,8 @@ sudo echo "vm.overcommit_memory = 1" | sudo tee -a /etc/sysctl.conf && sudo sysc
 sudo mkdir -p /opt/redis/var
 sudo chown -R cuba:cuba /opt/redis/var
 
-sudo mkdir -p /etc/redis && sudo cp 6379.conf /etc/redis/
-sudo cp redis-server.service /etc/systemd/system/
+sudo mkdir -p /etc/redis && sudo cp redis/6379.conf /etc/redis/
+sudo cp redis/redis-server.service /etc/systemd/system/
 sudo systemctl daemon-reload
 # systemctl start redis-server.service && \
     # sudo systemctl enable redis-server.service
