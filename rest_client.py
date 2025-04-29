@@ -18,6 +18,7 @@ class CubaRestClient:
 
     def get_device_attributes(self, device):
         attrs = ""
+        # TODO: Read attributes from Redis
         with open(self._config_path, "r") as config_file:
             logger.info(config_file)
             logger.info(self._config_path)
@@ -35,11 +36,15 @@ class CubaRestClient:
                     attributes = rest_client.get_device_attributes(
                         device, shared_keys=attrs, client_keys=""
                     )
+                    # TODO: Save attributes to Redis DB.
+                    if not attributes.get("shared"):
+                        return
                     with open(self._config_path, "w") as config_file:
-                        shared_attrs = attributes["shared"]
-                        for k, v in shared_attrs.items():
-                            config[k] = v
-                        json.dump(config, config_file, indent=2)
+                        shared_attrs = attributes.get("shared")
+                        if shared_attrs:
+                            for k, v in shared_attrs.items():
+                                config[k] = v
+                            json.dump(config, config_file, indent=2)
 
                 except ApiException as e:
                     logger.exception(e)

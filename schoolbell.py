@@ -112,6 +112,7 @@ class SchoolBell(TBDeviceMqttClient):
 
     def update_config(self, key: str, value) -> None:
         config = None
+        # TODO: Update Redis value
         with open(self._config_path, "r") as config_file:
             config = json.load(config_file)
             config[key] = value

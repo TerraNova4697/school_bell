@@ -19,7 +19,7 @@ class CronManager:
     ):
         self._user = user
         self._cron = CronTab(
-            user=True, log="/school-bell/cronjobs.log"
+            user=True, log="/var/log/school_bell/cronjobs.log"
         )
         self._exec_service = exec_service
         self._exec_file = exec_file
@@ -32,6 +32,7 @@ class CronManager:
     def rewrite_schedule(self):
         self._cron.remove_all(comment="schedule")
         configs = {}
+        # TODO: Read configs from Redis.
         with open(self._config_path, "r") as config_file:
             config = json.load(config_file)
             configs["days"] = config["days"]
@@ -48,14 +49,14 @@ class CronManager:
 
             lesson_shift = lesson['shift']
             job = self._cron.new(
-                command=f'su cuba -c "{self._exec_service} {self._exec_file} --type start --shift {lesson_shift} --lesson {lesson_num} >> /school-bell/cronjobs.log 2>&1"',  # noqa
+                command=f'su {self._user} -c "{self._exec_service} {self._exec_file} --type start --shift {lesson_shift} --lesson {lesson_num} >> /var/log/school_bell/cronjobs.log 2>&1"',  # noqa
                 comment="schedule",
                 user=self._user,
             )
             job.setall(f'{lesson["start_minute"]} {lesson["start_hour"]} * * {new_dow}')
 
             job = self._cron.new(
-                command=f'su cuba -c "{self._exec_service} {self._exec_file} --type end --shift {lesson_shift} --lesson {lesson_num} >> /school-bell/cronjobs.log 2>&1"',  # noqa
+                command=f'su {self._user} -c "{self._exec_service} {self._exec_file} --type end --shift {lesson_shift} --lesson {lesson_num} >> /var/log/school_bell/cronjobs.log 2>&1"',  # noqa
                 comment="schedule",
                 user=self._user,
             )
@@ -69,17 +70,16 @@ class CronManager:
         self._cron.write(user=True)
 
     def run_now(self, attribute):
-
+        logger.info("Removing all previous alarms")
         self._cron.remove_all(comment="alarm")
 
         try:
+            cmd = f'su {self._user}  -c "{self._exec_service} /home/{self._user}/school_bell/alarm.py --alarm {attribute} >> /var/log/school_bell/cronjobs.log 2>&1"'
             job = self._cron.new(
-                command=f'su cuba  -c "{self._exec_service} /school-bell/alarm.py --alarm {attribute} >> /school-bell/cronjobs.log 2>&1"',  # noqa
+                command=cmd,  # noqa
                 comment="alarm",
                 user=self._user,
             )
-            # job.setall("0 0 * * *")
-            # self._cron.write(user=True)
             thread = Thread(target=job.run)
             thread.start()
             logger.info("task runs")

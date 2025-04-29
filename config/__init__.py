@@ -6,5 +6,5 @@ import logging
 
 @dataclass
 class Log:
-    logfiles = ["log/debug.log", "log/development.log", "log/production.log"]
+    logfiles = ["/var/log/school_bell/debug.log", "/var/log/school_bell/development.log", "/var/log/school_bell/production.log"]
     levels = [logging.DEBUG, logging.INFO, logging.WARNING]

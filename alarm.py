@@ -61,5 +61,8 @@ if __name__ == "__main__":
     try:
         args = parse_args()
         asyncio.run(main(args.alarm))
+    except Exception as e:
+        logger.exception(e)
+        print(e)
     finally:
         exit()
