@@ -26,9 +26,21 @@ def find_and_kill_alarms():
 
 def main():
     while True:
-        fire = int(_redis.get("fire").decode())
-        alarm = int(_redis.get("alarm").decode())
-        test = int(_redis.get("test").decode())
+        fire_bin = _redis.get("fire").decode()
+        alarm_bin = _redis.get("alarm").decode()
+        test_bin = _redis.get("test").decode()
+        if fire_bin:
+            fire = int(fire_bin)
+        else:
+            fire = None
+        if alarm_bin:
+            alarm = int(alarm_bin)
+        else:
+            alarm = None
+        if test_bin:
+            test = int(test_bin)
+        else:
+            test = None
         if not fire and not alarm and not test:
             find_and_kill_alarms()
             time.sleep(1)
