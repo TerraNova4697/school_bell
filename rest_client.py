@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import json
 import redis
@@ -54,3 +55,29 @@ class CubaRestClient:
 
                 except ApiException as e:
                     logger.exception(e)
+
+    async def get_device_attributes_loop(self, device):
+        await asyncio.sleep(10)
+        while True:
+            with RestClientPE(base_url=self._url) as rest_client:
+                try:
+                    attrs = "test,alarm,fire,ambulance"
+                    attributes = rest_client.get_device_attributes(
+                        device, shared_keys=attrs, client_keys=""
+                    )
+                    if not attributes.get("shared"):
+                            await asyncio.sleep(5)
+                            continue
+                    shared_attrs = attributes.get("shared")
+                    test, alarm, fire, ambulance = shared_attrs.get("test"), shared_attrs.get("alarm"), shared_attrs.get("fire"), shared_attrs.get("ambulance")
+                    if test is not None:
+                        self._redis.set("test", "1" if test else "0")
+                    if alarm is not None:
+                        self._redis.set("alarm", "1" if alarm else "0")
+                    if fire is not None:
+                        self._redis.set("fire", "1" if fire else "0")
+                    if ambulance is not None:
+                        self._redis.set("ambulance", "1" if ambulance else "0")
+                except ApiException as e:
+                    logger.exception(e)
+            await asyncio.sleep(5)

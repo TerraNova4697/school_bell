@@ -28,6 +28,7 @@ async def run_server():
         rest_client = CubaRestClient(
             CUBA_URL, CUBA_USER_EMAIL, CUBA_USER_PASSWORD, CONFIG_PATH
         )
+        asyncio.create_task(rest_client.get_device_attributes_loop())
         rest_client.get_device_attributes(device=SCHOOL_BELL_TOKEN)
 
         # Instantiate cron manager instance.
