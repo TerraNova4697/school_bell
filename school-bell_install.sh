@@ -29,4 +29,5 @@ sudo cp cuba-school-bell.service /etc/systemd/system
 sudo cp ps_killer/ps-killer.service /etc/systemd/system
 sudo systemctl daemon-reload
 
-echo "School Bell installed.\nDon't forget to set your ENV in .env file.\n"
+echo "School Bell installed."
+echo "Don't forget to set your ENV in .env file."
