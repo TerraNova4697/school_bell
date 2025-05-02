@@ -1,8 +1,10 @@
 [Unit]
 Description=Alarm Killer Daemon
-After=network.target
+Requires=redis-server.service
+After=redis-server.service
 
 [Service]
+ExecStartPre=/bin/bash -c 'until nc -z 127.0.0.1 6379; do sleep 1; done'
 ExecStart=/home/cuba/school_bell/.venv/bin/python3 /home/cuba/school_bell/ps_killer/ps_killer.py
 Restart=always
 RestartSec=3
