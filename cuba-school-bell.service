@@ -10,8 +10,8 @@ Restart=always
 RestartSec=3
 
 # Логи
-StandardOutput=append:/var/log/school_bell/alarm-killer.log
-StandardError=append:/var/log/school_bell/alarm-killer.log
+StandardOutput=append:/var/log/school_bell/school-bell.log
+StandardError=append:/var/log/school_bell/school-bell.log
 
 [Install]
 WantedBy=multi-user.target

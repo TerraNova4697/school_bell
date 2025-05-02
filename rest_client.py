@@ -4,6 +4,7 @@ import json
 import redis
 
 from tb_rest_client.rest_client_pe import RestClientPE
+from tb_rest_client.rest_client_ce import RestClientCE
 from tb_rest_client.rest import ApiException
 
 
@@ -59,7 +60,7 @@ class CubaRestClient:
     async def get_device_attributes_loop(self, device):
         await asyncio.sleep(10)
         while True:
-            with RestClientPE(base_url=self._url) as rest_client:
+            with RestClientCE(base_url=self._url) as rest_client:
                 try:
                     attrs = "test,alarm,fire,ambulance"
                     attributes = rest_client.get_device_attributes(
