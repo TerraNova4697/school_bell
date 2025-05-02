@@ -62,6 +62,8 @@ class CubaRestClient:
         while True:
             with RestClientCE(base_url=self._url) as rest_client:
                 try:
+                    # Auth with credentials
+                    rest_client.login(username=self._username, password=self._password)
                     attrs = "test,alarm,fire,ambulance"
                     attributes = rest_client.get_device_attributes(
                         device, shared_keys=attrs, client_keys=""
