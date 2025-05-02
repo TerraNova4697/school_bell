@@ -1,5 +1,5 @@
 [Unit]
-Description=Alarm Killer Daemon
+Description=School Bell Daemon
 Requires=redis-server.service
 After=redis-server.service
 
