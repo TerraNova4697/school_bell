@@ -3,27 +3,36 @@
 
 set -e
 
-if dpkg -l | grep -q redis-server; then
-    echo "Удаление Redis, установленного через APT..."
-    sudo systemctl stop redis-server || true
-    sudo apt purge -y redis-server redis-tools
-    sudo apt autoremove -y
-    echo "APT-установка Redis удалена"
+DAEMON_FILE=/etc/systemd/system/redis-server.service
+CONF_DIR=/etc/redis
+SOURCE_DIR=/opt/redis
+
+echo "Stopping Redis service..."
+if systemctl list-unit-files | grep -q '^redis-server.service'; then
+    sudo systemctl stop redis-server.service
+    sudo systemctl disable redis-server.service
+    echo "Stopped Redis service."
 else
-    echo "ℹ️ Redis не установлен через APT"
+    echo "Redis service not found. Skipping stop/disable."
 fi
 
-if [ -d "/opt/redis" ]; then
-    echo "Удаление Redis, установленного из исходников"
-    sudo systemctl stop redis-server.service 2>/dev/null || true
-    sudo systemctl disable redis-server.service 2>/dev/null || true
-    sudo rm -f /etc/systemd/system/redis-server.service
+echo "Deleting redis daemon..."
+if [ -f "$DAEMON_FILE" ]; then
+    sudo rm /etc/systemd/system/redis-server-service
     sudo systemctl daemon-reload
-
-    sudo rm -rf /opt/redis
-    echo "Удалена ручная установка Redis из /opt/redis"
-else
-    echo "Ручная установка Redis в /opt/redis не найдена"
+    echo "Redis daemon deleted."
+else 
+    echo "Unit file not found. Skipping service file removing."
 fi
 
-echo "Удаление завершено."
+echo "Deleting Redis installation & conf dirs..."
+if [ -d "$CONF_DIR" ]; then
+    sudo rm -rf /opt/redis
+fi
+
+if [ -d "$SOURCE_DIR" ]; then
+    sudo rm -rf /etc/redis
+fi
+echo "Deleted Redis installation dir."
+
+echo "Redis successfully uninstalled."
