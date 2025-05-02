@@ -8,8 +8,10 @@ sudo rm -rf /usr/share/school_bell
 echo "School Bell app components deleted."
 
 read -p "Do you wish to delete logs: $LOG_DIR? (y/n): " ANSWER
-case "$answer" in
-    y|Y)
+# Удаляем пробелы и приводим к нижнему регистру
+ANSWER=$(echo "$ANSWER" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+case "$ANSWER" in
+    y)
         if [ -d "$LOG_DIR" ]; then
             echo "Deleting logs..."
             sudo rm -rf "$LOG_DIR"
@@ -18,7 +20,7 @@ case "$answer" in
             echo "ℹ️ Папка логов не найдена: $LOG_DIR"
         fi
         ;;
-    n|N)
+    n)
         echo "Skipping logs."
         ;;
     *)
