@@ -29,15 +29,15 @@ def main():
         fire_bin = _redis.get("fire").decode()
         alarm_bin = _redis.get("alarm").decode()
         test_bin = _redis.get("test").decode()
-        if fire_bin:
+        if fire_bin.decode():
             fire = int(fire_bin)
         else:
             fire = None
-        if alarm_bin:
+        if alarm_bin.decode():
             alarm = int(alarm_bin)
         else:
             alarm = None
-        if test_bin:
+        if test_bin.decode():
             test = int(test_bin)
         else:
             test = None
