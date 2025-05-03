@@ -26,9 +26,9 @@ def find_and_kill_alarms():
 
 def main():
     while True:
-        fire_bin = _redis.get("fire").decode()
-        alarm_bin = _redis.get("alarm").decode()
-        test_bin = _redis.get("test").decode()
+        fire_bin = _redis.get("fire")
+        alarm_bin = _redis.get("alarm")
+        test_bin = _redis.get("test")
         if fire_bin.decode():
             fire = int(fire_bin)
         else:
