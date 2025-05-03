@@ -29,5 +29,7 @@ sudo cp cuba-school-bell.service /etc/systemd/system
 sudo cp ps_killer/ps-killer.service /etc/systemd/system
 sudo systemctl daemon-reload
 
+sudo timedatectl set-timezone Asia/Almaty
+
 echo "School Bell installed."
 echo "Don't forget to set your ENV in .env file."
