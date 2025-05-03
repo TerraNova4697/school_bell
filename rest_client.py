@@ -82,5 +82,9 @@ class CubaRestClient:
                     if ambulance is not None:
                         self._redis.set("ambulance", "1" if ambulance else "0")
                 except ApiException as e:
+                    self._redis.set("test", "0")
+                    self._redis.set("alarm", "0")
+                    self._redis.set("fire", "0")
+                    self._redis.set("ambulance", "0")
                     logger.exception(e)
             await asyncio.sleep(5)
