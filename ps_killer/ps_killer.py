@@ -29,18 +29,10 @@ def main():
         fire_bin = _redis.get("fire")
         alarm_bin = _redis.get("alarm")
         test_bin = _redis.get("test")
-        if fire_bin.decode():
-            fire = int(fire_bin)
-        else:
-            fire = None
-        if alarm_bin.decode():
-            alarm = int(alarm_bin)
-        else:
-            alarm = None
-        if test_bin.decode():
-            test = int(test_bin)
-        else:
-            test = None
+
+        fire = int(fire_bin) if fire_bin else None
+        alarm = int(alarm_bin) if alarm_bin else None
+        test = int(test_bin) if test_bin else None
         if not fire and not alarm and not test:
             find_and_kill_alarms()
             time.sleep(1)
