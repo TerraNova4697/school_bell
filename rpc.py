@@ -75,3 +75,15 @@ class StartLessonPath(BaseModel):
 
 class TestPath(BaseModel):
     testPath: str
+
+
+class Button_1(BaseModel):
+    button_1: bool
+
+
+class Button_2(BaseModel):
+    button_2: bool
+
+
+class Button_3(BaseModel):
+    button_3: bool

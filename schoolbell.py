@@ -225,12 +225,14 @@ class SchoolBell(TBDeviceMqttClient):
 
     def handle_updated_attribute_and_run_alarm(self, body, *args):
         self.handle_updated_attribute(body, args)
-        attribute, value = list(body.items())[0]
-        logger.info(f"current value of {attribute} is {value}")
-        if value:
-            self.cron_manager.run_now(attribute)
-        else:
-            stop_priority()
+        for i in range(len(body)):
+            attribute, value = list(body.items())[i]
+            if attribute in ["fire", "alarm", "test"]:
+                logger.info(f"current value of {attribute} is {value}")
+                if value:
+                    self.cron_manager.run_now(attribute)
+                else:
+                    stop_priority()
 
     def handle_updated_attribute_and_save_audio(self, body, *args):
         attribute, value = list(body.items())[0]
