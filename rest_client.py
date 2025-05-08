@@ -58,7 +58,7 @@ class CubaRestClient:
                 except ApiException as e:
                     logger.exception(e)
 
-    async def get_device_attributes_loop(self, device):
+    async def get_device_attributes_loop(self, device, cron):
         await asyncio.sleep(5)
         while True:
             with RestClientCE(base_url=self._url) as rest_client:
@@ -79,8 +79,12 @@ class CubaRestClient:
                         self._redis.set("test", "1" if test else "0")
                     if alarm is not None:
                         self._redis.set("alarm", "1" if alarm else "0")
+                        if alarm:
+                            cron.run_now("alarm")
                     if fire is not None:
                         self._redis.set("fire", "1" if fire else "0")
+                        if fire:
+                            cron.run_now("fire")
                     if ambulance is not None:
                         self._redis.set("ambulance", "1" if ambulance else "0")
                 except (ApiException, requests.exceptions.ConnectionError) as e:

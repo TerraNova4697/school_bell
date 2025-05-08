@@ -28,11 +28,11 @@ async def run_server():
         rest_client = CubaRestClient(
             CUBA_URL, CUBA_USER_EMAIL, CUBA_USER_PASSWORD, CONFIG_PATH
         )
-        asyncio.create_task(rest_client.get_device_attributes_loop(device=SCHOOL_BELL_TOKEN))
         rest_client.get_device_attributes(device=SCHOOL_BELL_TOKEN)
 
         # Instantiate cron manager instance.
         cron_manager = CronManager(USER, EXEC_SERVICE, EXEC_FILE, CONFIG_PATH)
+        asyncio.create_task(rest_client.get_device_attributes_loop(device=SCHOOL_BELL_TOKEN, cron=cron_manager))
 
         # The main class of the brogramm. Connects to cuba and listens for attributes.
         school = SchoolBell(CUBA_URL, SCHOOL_BELL_TOKEN, cron_manager, CONFIG_PATH)
