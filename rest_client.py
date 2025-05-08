@@ -2,6 +2,7 @@ import asyncio
 import logging
 import json
 import redis
+import requests
 
 from tb_rest_client.rest_client_pe import RestClientPE
 from tb_rest_client.rest_client_ce import RestClientCE
@@ -58,7 +59,7 @@ class CubaRestClient:
                     logger.exception(e)
 
     async def get_device_attributes_loop(self, device):
-        await asyncio.sleep(10)
+        await asyncio.sleep(5)
         while True:
             with RestClientCE(base_url=self._url) as rest_client:
                 try:
@@ -73,6 +74,7 @@ class CubaRestClient:
                             continue
                     shared_attrs = attributes.get("shared")
                     test, alarm, fire, ambulance = shared_attrs.get("test"), shared_attrs.get("alarm"), shared_attrs.get("fire"), shared_attrs.get("ambulance")
+
                     if test is not None:
                         self._redis.set("test", "1" if test else "0")
                     if alarm is not None:
@@ -81,7 +83,7 @@ class CubaRestClient:
                         self._redis.set("fire", "1" if fire else "0")
                     if ambulance is not None:
                         self._redis.set("ambulance", "1" if ambulance else "0")
-                except ApiException as e:
+                except (ApiException, requests.exceptions.ConnectionError) as e:
                     self._redis.set("test", "0")
                     self._redis.set("alarm", "0")
                     self._redis.set("fire", "0")
