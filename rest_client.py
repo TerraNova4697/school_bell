@@ -79,11 +79,11 @@ class CubaRestClient:
                         self._redis.set("test", "1" if test else "0")
                     if alarm is not None:
                         self._redis.set("alarm", "1" if alarm else "0")
-                        if alarm and int(self._redis.get("alarm").decode()) != 1:
+                        if alarm:
                             cron.run_now("alarm")
                     if fire is not None:
                         self._redis.set("fire", "1" if fire else "0")
-                        if fire and int(self._redis.get("fire").decode()) != 1:
+                        if fire:
                             cron.run_now("fire")
                     if ambulance is not None:
                         self._redis.set("ambulance", "1" if ambulance else "0")
