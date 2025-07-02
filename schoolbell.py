@@ -22,7 +22,7 @@ REMOTE_USER = "nikita"
 REMOTE_HOST = "192.168.11.182"
 REMOTE_PORT = 2222  # Порт на удалённом сервере, через который будет доступен локальный SSH
 LOCAL_PORT = 22     # Обычно порт SSH на локальной машине
-SSH_KEY_PATH = "/home/user/.ssh/id_rsa"  # путь до приватного ключа
+SSH_KEY_PATH = "/home/cuba/.ssh/id_rsa"  # путь до приватного ключа
 
 
 tunnel_process = None
@@ -31,11 +31,11 @@ tunnel_process = None
 def start_ssh_tunnel():
     global tunnel_process
     if tunnel_process is not None:
-        print("❗️Tunnel already running.")
+        logger.info("Tunnel already running.")
         return
 
     try:
-        print("🔌 Starting SSH tunnel...")
+        logger.info("Starting SSH tunnel...")
         tunnel_process = subprocess.Popen([
             "ssh",
             "-i", SSH_KEY_PATH,
@@ -44,25 +44,25 @@ def start_ssh_tunnel():
             "-R", f"{REMOTE_PORT}:localhost:22",
             f"{REMOTE_USER}@{REMOTE_HOST}"
         ])
-        print(f"✅ SSH tunnel started with PID: {tunnel_process.pid}")
+        logger.info(f"SSH tunnel started with PID: {tunnel_process.pid}")
     except Exception as e:
-        print(f"❌ Failed to start SSH tunnel: {e}")
+        logger.info(f"Failed to start SSH tunnel: {e}")
 
 
 def stop_ssh_tunnel():
     global tunnel_process
     if tunnel_process is None:
-        print("❗️No tunnel process to terminate.")
+        logger.info("No tunnel process to terminate.")
         return
 
-    print(f"⛔ Stopping SSH tunnel with PID: {tunnel_process.pid}")
+    logger.info(f"Stopping SSH tunnel with PID: {tunnel_process.pid}")
     tunnel_process.terminate()
     try:
         tunnel_process.wait(timeout=5)
-        print("✅ Tunnel stopped.")
+        logger.info("Tunnel stopped.")
     except subprocess.TimeoutExpired:
         tunnel_process.kill()
-        print("⚠️ Tunnel killed after timeout.")
+        logger.info("Tunnel killed after timeout.")
     finally:
         tunnel_process = None
 
@@ -253,15 +253,15 @@ class SchoolBell(TBDeviceMqttClient):
             try:
                 start_ssh_tunnel()
             except KeyboardInterrupt:
-                print("⛔ Tunnel stopped manually")
+                logger.info("Tunnel stopped manually")
             except Exception as e:
-                print("❌ Failed to start tunnel:", str(e))
+                logger.info("Failed to start tunnel:", str(e))
 
         elif method == "ssh_tunnel_off":
             try:
                 stop_ssh_tunnel()
             except Exception as e:
-                print("Unhandled exception: ", e)
+                logger.info("Unhandled exception: ", e)
 
         else:
             logger.warning(f"Unknown method for {self.__class__.__name__}: {method}")
