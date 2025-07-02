@@ -75,6 +75,7 @@ class SchoolBell(TBDeviceMqttClient):
         self.cron_manager = cron_manager
         self._config_path = config_path
         self._redis = redis.Redis(db=0)
+        self.listen_rpc()
         super().__init__(self.url, username=self.token)
 
     def listen_rpc(self):
