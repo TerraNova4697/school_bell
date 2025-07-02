@@ -19,7 +19,7 @@ logger = logging.getLogger("scheduler_logger")
 
 
 REMOTE_USER = "nikita"
-REMOTE_HOST = "192.168.11.182"
+REMOTE_HOST = "192.168.11.184"
 REMOTE_PORT = 2222  # Порт на удалённом сервере, через который будет доступен локальный SSH
 LOCAL_PORT = 22     # Обычно порт SSH на локальной машине
 SSH_KEY_PATH = "/home/cuba/.ssh/id_rsa"  # путь до приватного ключа
