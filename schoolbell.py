@@ -256,20 +256,37 @@ class SchoolBell(TBDeviceMqttClient):
 
         elif method == "ssh_tunnel_on":
             try:
-                tunnel_thread = threading.Thread(target=start_ssh_tunnel, daemon=True)
-                tunnel_thread.start()
-            except KeyboardInterrupt:
-                logger.info("Tunnel stopped manually")
+                result = subprocess.run(
+                    ["systemctl", "start", "remotessh"],
+                    check=True,
+                    capture_output=True,
+                    text=True
+                )
+                print(f" Сервис remotessh успешно запущен.")
+                return True
+            except subprocess.CalledProcessError as e:
+                print(f" Ошибка при запуске сервиса remotessh: {e.stderr}")
+                return False
             except Exception as e:
-                logger.info("Failed to start tunnel:", str(e))
+                print(f" Непредвиденная ошибка: {e}")
+                return False
 
         elif method == "ssh_tunnel_off":
             try:
-                if tunnel_process and tunnel_process.poll() is None:
-                    os.killpg(os.getpgid(tunnel_process.pid), signal.SIGTERM)
-                    tunnel_thread.join()
+                result = subprocess.run(
+                    ["systemctl", "stop", "remotessh"],
+                    check=True,
+                    capture_output=True,
+                    text=True
+                )
+                print(f" Сервис remotessh успешно остановлен.")
+                return True
+            except subprocess.CalledProcessError as e:
+                print(f" Ошибка при остановке сервиса remotessh: {e.stderr}")
+                return False
             except Exception as e:
-                logger.info("Unhandled exception: ", e)
+                print(f" Непредвиденная ошибка: {e}")
+                return False
 
         else:
             logger.warning(f"Unknown method for {self.__class__.__name__}: {method}")
