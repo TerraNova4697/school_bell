@@ -38,11 +38,11 @@ def start_ssh_tunnel():
         logger.info("Starting SSH tunnel...")
         tunnel_process = subprocess.Popen([
             "ssh",
+            "-R",
+            f"{REMOTE_PORT}:localhost:22",
+            f"{REMOTE_USER}@{REMOTE_HOST}"
             "-i", SSH_KEY_PATH,
             "-o", "StrictHostKeyChecking=no",
-            "-N",  # Do not execute remote command
-            "-R", f"{REMOTE_PORT}:localhost:22",
-            f"{REMOTE_USER}@{REMOTE_HOST}"
         ])
         logger.info(f"SSH tunnel started with PID: {tunnel_process.pid}")
     except Exception as e:
