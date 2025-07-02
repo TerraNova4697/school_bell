@@ -43,7 +43,11 @@ def start_ssh_tunnel():
             f"{REMOTE_USER}@{REMOTE_HOST}",
             "-i", SSH_KEY_PATH,
             "-o", "StrictHostKeyChecking=no",
-        ])
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        stdout, stderr = tunnel_process.communicate(timeout=10)
+        print("STDOUT:", stdout.decode())
+        print("STDERR:", stderr.decode())
         logger.info(f"SSH tunnel started with PID: {tunnel_process.pid}")
         tunnel_process.wait()
     except Exception as e:
