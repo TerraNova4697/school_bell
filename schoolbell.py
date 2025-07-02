@@ -46,8 +46,8 @@ def start_ssh_tunnel():
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         stdout, stderr = tunnel_process.communicate(timeout=10)
-        print("STDOUT:", stdout.decode())
-        print("STDERR:", stderr.decode())
+        logger.info("STDOUT:", stdout.decode())
+        logger.info("STDERR:", stderr.decode())
         logger.info(f"SSH tunnel started with PID: {tunnel_process.pid}")
         tunnel_process.wait()
     except Exception as e:
