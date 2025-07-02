@@ -45,6 +45,7 @@ def start_ssh_tunnel():
             "-o", "StrictHostKeyChecking=no",
         ])
         logger.info(f"SSH tunnel started with PID: {tunnel_process.pid}")
+        tunnel_process.wait()
     except Exception as e:
         logger.info(f"Failed to start SSH tunnel: {e}")
 
