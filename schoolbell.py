@@ -3,6 +3,7 @@ import json
 import base64
 import os
 import subprocess
+import signal
 import datetime
 import threading
 
@@ -266,7 +267,6 @@ class SchoolBell(TBDeviceMqttClient):
                 logger.info("Failed to start tunnel:", str(e))
 
         elif method == "ssh_tunnel_off":
-            global tunnel_thread
             try:
                 if tunnel_process and tunnel_process.poll() is None:
                     os.killpg(os.getpgid(tunnel_process.pid), signal.SIGTERM)
