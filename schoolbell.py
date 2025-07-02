@@ -4,6 +4,7 @@ import base64
 import os
 import subprocess
 import datetime
+import threading
 
 from tb_device_mqtt import TBDeviceMqttClient
 from pydantic import ValidationError
@@ -16,6 +17,7 @@ import redis
 
 
 logger = logging.getLogger("scheduler_logger")
+tunnel_thread = None
 
 
 REMOTE_USER = "nikita"
@@ -256,15 +258,19 @@ class SchoolBell(TBDeviceMqttClient):
 
         elif method == "ssh_tunnel_on":
             try:
-                start_ssh_tunnel()
+                tunnel_thread = threading.Thread(target=start_ssh_tunnel, daemon=True)
+                tunnel_thread.start()
             except KeyboardInterrupt:
                 logger.info("Tunnel stopped manually")
             except Exception as e:
                 logger.info("Failed to start tunnel:", str(e))
 
         elif method == "ssh_tunnel_off":
+            global tunnel_thread
             try:
-                stop_ssh_tunnel()
+                if tunnel_process and tunnel_process.poll() is None:
+                    os.killpg(os.getpgid(tunnel_process.pid), signal.SIGTERM)
+                    tunnel_thread.join()
             except Exception as e:
                 logger.info("Unhandled exception: ", e)
 
