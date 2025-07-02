@@ -40,7 +40,7 @@ def start_ssh_tunnel():
             "ssh",
             "-R",
             f"{REMOTE_PORT}:localhost:22",
-            f"{REMOTE_USER}@{REMOTE_HOST}"
+            f"{REMOTE_USER}@{REMOTE_HOST}",
             "-i", SSH_KEY_PATH,
             "-o", "StrictHostKeyChecking=no",
         ])
