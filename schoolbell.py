@@ -31,6 +31,57 @@ SSH_KEY_PATH = "/home/cuba/.ssh/id_rsa"  # путь до приватного к
 tunnel_process = None
 
 
+
+def is_container_running(container_name: str) -> bool:
+    result = subprocess.run(
+        ["docker", "ps", "-q", "-f", f"name={container_name}"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+    return bool(result.stdout.strip())
+    
+
+def start_container(container_name: str) -> bool:
+    try:
+        if is_container_running(container_name):
+            return True
+
+        command = (
+            "curl -sSf http://ssh.cubaiot.kz/install.sh | "
+            "TENANT_ID=8f9ca7d3-f133-4534-b503-eac536fb29d2 "
+            "SERVER_ADDRESS=http://ssh.cubaiot.kz sh"
+        )
+        subprocess.run(command, shell=True, check=True)
+        return is_container_running(container_name)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to start container: {e}")
+        return False
+    
+
+def stop_and_remove_container(container_name: str) -> bool:
+    try:
+        # Останавливаем контейнер, если он работает
+        subprocess.run(["docker", "stop", container_name], check=True)
+    except subprocess.CalledProcessError:
+        # Контейнер уже остановлен или не существует — игнорируем
+        pass
+
+    try:
+        # Удаляем контейнер
+        subprocess.run(["docker", "rm", container_name], check=True)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Ошибка при удалении контейнера: {e}")
+        return False
+    
+
+def ensure_container_running(container_name: str) -> bool:
+    if is_container_running(container_name):
+        return True
+    return start_container(container_name)
+
+
 def start_ssh_tunnel():
     global tunnel_process
     if tunnel_process is not None:
@@ -256,14 +307,7 @@ class SchoolBell(TBDeviceMqttClient):
 
         elif method == "ssh_tunnel_on":
             try:
-                result = subprocess.run(
-                    ["systemctl", "start", "remotessh"],
-                    check=True,
-                    capture_output=True,
-                    text=True
-                )
-                print(f" Сервис remotessh успешно запущен.")
-                return True
+                return start_container("shellhub")
             except subprocess.CalledProcessError as e:
                 print(f" Ошибка при запуске сервиса remotessh: {e.stderr}")
                 return False
@@ -273,13 +317,7 @@ class SchoolBell(TBDeviceMqttClient):
 
         elif method == "ssh_tunnel_off":
             try:
-                result = subprocess.run(
-                    ["systemctl", "stop", "remotessh"],
-                    check=True,
-                    capture_output=True,
-                    text=True
-                )
-                print(f" Сервис remotessh успешно остановлен.")
+                return stop_and_remove_container("shellhub")
                 return True
             except subprocess.CalledProcessError as e:
                 print(f" Ошибка при остановке сервиса remotessh: {e.stderr}")
